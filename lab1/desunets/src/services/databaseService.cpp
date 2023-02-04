@@ -1,5 +1,4 @@
 #include "databaseService.h"
-
 #include <iostream>
 
 sqlite3* db;
@@ -47,9 +46,15 @@ std::vector<std::string> getListOfUsers() {
 }
 
 std::vector<std::string> getChat(std::string getterId, std::string senderId) {
-    std::string query = "SELECT msg, uname FROM msgs JOIN users ON users.id = msgs.sender  WHERE sender=" 
-    + std::to_string(getUsrId(senderId)) + " OR sender=" + std::to_string(getUsrId(getterId)) + " AND getter=" 
-    + std::to_string(getUsrId(senderId)) + " OR getter=" + std::to_string(getUsrId(getterId)) + ";";
+    std::string query = "SELECT msg, uname FROM msgs JOIN users ON users.id = msgs.sender  WHERE (sender=" 
+    + std::to_string(getUsrId(senderId)) + " OR sender=" + std::to_string(getUsrId(getterId)) + ") AND (getter=" 
+    + std::to_string(getUsrId(senderId)) + " OR getter=" + std::to_string(getUsrId(getterId)) + ")";
+
+    if (getterId == senderId)
+        query += ";";
+    else
+        query += "AND getter <> sender;";
+
     std::vector<std::string> result;
     sqlite3_stmt* stmt;
 

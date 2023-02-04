@@ -1,3 +1,3 @@
 default:
-	clang++ src/main.cpp src/clientServices.cpp -o desunetc.exe
+	clang++ src/main.cpp src/services/clientServices.cpp -o desunetc.exe
 	./desunetc.exe

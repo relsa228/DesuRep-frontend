@@ -1,19 +1,18 @@
 #include "serverService.h"
 
-
 void clientAuth(SOCKET newConnection) {
 	int credsSize;
+	std::string credsStr;
+	std::string username = "";
+	std::string password = "";
+	bool passFlag = false;
 
 	recv(newConnection, (char*)&credsSize, sizeof(int), NULL);
 	char* creds = new char[credsSize + 1];
 	creds[credsSize] = '\0';
 	recv(newConnection, creds, credsSize, NULL);
+	credsStr = creds;
 
-	std::string username = "";
-	std::string password = "";
-	bool passFlag = false;
-
-	std::string credsStr = creds;
 	for(auto ch : credsStr) {
 		if (ch == '\n') {
 			passFlag = true;
@@ -38,8 +37,8 @@ void clientAuth(SOCKET newConnection) {
 
 void sendListOfUsers(SOCKET newConnection) {
 	std::vector<std::string> listOfUsers = getListOfUsers();
-
 	std::string stringOfUsers = "-l\n";
+
 	for(auto uname : listOfUsers) {
 		stringOfUsers += uname;
 		stringOfUsers += "\n";
@@ -53,15 +52,17 @@ void sendListOfUsers(SOCKET newConnection) {
 
 void sendChatList(SOCKET newConnection) {
 	int chatUsersSize;
+	std::string chatUsersStr;
+	std::string getter = "";
+	std::string sender = "";
+	bool inptFlag = true;
+
 	recv(newConnection, (char*)&chatUsersSize, sizeof(int), NULL);
 	char* chatUsers = new char[chatUsersSize + 1];
 	chatUsers[chatUsersSize] = '\0';
 	recv(newConnection, chatUsers, chatUsersSize, NULL);
-	std::string chatUsersStr = chatUsers;
+	chatUsersStr = chatUsers;
 
-	std::string getter = "";
-	std::string sender = "";
-	bool inptFlag = true;
 	for(auto ch : chatUsersStr) {
 		if (ch == '\n')
 			inptFlag = false;
@@ -70,6 +71,7 @@ void sendChatList(SOCKET newConnection) {
 		else 
 			sender += ch;
 	}
+
 	std::vector<std::string> vectOfMsgs = getChat(getter, sender);
 	std::string stringOfMsgs = "-c\n";
 	for(auto msg : vectOfMsgs) {
@@ -121,4 +123,43 @@ void saveMsg(SOCKET newConnection) {
 
 	saveMsg(getterName, senderName, messageStr);
 }
-void regUser(SOCKET newConnection) {}
+
+void regUser(SOCKET newConnection) {
+	std::string regCreds = "";
+	std::string regUname = "";
+	std::string regPass = "";
+	bool inptFlag = true;
+	int messageSize;
+
+	while(true) {
+		recv(newConnection, (char*)&messageSize, sizeof(int), NULL);
+		char* message = new char[messageSize + 1];
+		message[messageSize] = '\0';
+		recv(newConnection, message, messageSize, NULL);
+		regCreds = message;
+		if (message[0] == '-' && message[1] == 'r')
+			break;
+	}
+	regCreds.erase(0, 3);
+
+	for(auto ch : regCreds) {
+		if(ch == '\n') {
+			inptFlag = false;
+			continue;
+		}
+
+		if(inptFlag)
+			regUname += ch;
+		else
+			regPass += ch;
+	}
+
+	if (saveUsr(regUname, regPass)) {
+		char regResultFlag[3] = "-0";
+		send(newConnection, regResultFlag, sizeof(regResultFlag), NULL);
+	}
+	else {
+		char regResultFlag[3] = "-1";
+		send(newConnection, regResultFlag, sizeof(regResultFlag), NULL);
+	}
+}

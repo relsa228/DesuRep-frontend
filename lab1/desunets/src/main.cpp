@@ -11,8 +11,8 @@
 #include <winsock2.h>
 #include <iostream>
 
-#include "serverService.h"
-#include "databaseService.h"
+#include "services/serverService.h"
+#include "services/databaseService.h"
 
 #pragma warning(disable: 4996)
 
@@ -23,34 +23,22 @@ void usrInterface(int id) {
 		char flagOfCommand[3] = "";
 		recv(connectionList[id], flagOfCommand, sizeof(flagOfCommand), NULL);
 
-		if (strcmp(flagOfCommand, "-a") == 0) {
-					std::cout << "1\n";
-					clientAuth(connectionList[id]);
-		}
+		if (strcmp(flagOfCommand, "-a") == 0)
+			clientAuth(connectionList[id]);
 		
-		else if (strcmp(flagOfCommand, "-r") == 0){
-					std::cout << "2\n";
+		else if (strcmp(flagOfCommand, "-r") == 0)
+			regUser(connectionList[id]);
 
-			regUser(connectionList[id]);}
+		else if (strcmp(flagOfCommand, "-l") == 0)
+			sendListOfUsers(connectionList[id]);
 
-		else if (strcmp(flagOfCommand, "-l") == 0){
-					std::cout << "3\n";
+		else if (strcmp(flagOfCommand, "-m") == 0)
+			saveMsg(connectionList[id]);
 
-			sendListOfUsers(connectionList[id]);}
+		else if (strcmp(flagOfCommand, "-c") == 0) 
+			sendChatList(connectionList[id]);
 
-		else if (strcmp(flagOfCommand, "-m") == 0){
-					std::cout << "4\n";
-
-			saveMsg(connectionList[id]);}
-
-		else if (strcmp(flagOfCommand, "-c") == 0) {
-					std::cout << "5\n";
-
-			sendChatList(connectionList[id]);}
-
-		else if (strcmp(flagOfCommand, "-s") == 0) {
-					std::cout << "6\n";
-		}
+		else if (strcmp(flagOfCommand, "-s") == 0) {}
 	}
 }
 

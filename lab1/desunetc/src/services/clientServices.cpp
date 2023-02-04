@@ -59,10 +59,10 @@ void openChat(std::string contrAgentName, std::string username, SOCKET Connectio
 			}
 			buffer += ch;
 		}
-		std::cout << "\n> ";
+		std::cout << "\n" + username + "> ";
 
 		std::string outMsg = "";
-		std::cin >> outMsg;
+		std::getline (std::cin, outMsg);
 
 		if (outMsg == "/out") {
 			return;
@@ -105,5 +105,18 @@ SOCKET clientStartUp() {
 }
 
 bool reg(std::string uname, std::string password, SOCKET Connection) {
-    return true;
+	std::string sendCreds = "-r\n" + uname + "\n" + password;
+	
+	int sizeOfRegCreds = sendCreds.size();
+	send(Connection, (char*) &sizeOfRegCreds, sizeof(int), NULL);
+	send(Connection, sendCreds.c_str(), sizeOfRegCreds, NULL);
+
+	char regResult[3];
+	while(regResult[1] != '0' && regResult[1] != '1')
+		recv(Connection, regResult, sizeof(regResult), NULL);
+	
+	if(strcmp(regResult, "-0") == 0) 
+		return true;
+		
+	return false;
 }

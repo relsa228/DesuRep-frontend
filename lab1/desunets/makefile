@@ -1,3 +1,3 @@
 default:
-	clang src/main.cpp src/serverService.cpp src/databaseService.cpp src/sqlite3.c src/shell.c -o desunets.exe
+	clang src/main.cpp src/services/serverService.cpp src/services/databaseService.cpp src/sqlite/sqlite3.c src/sqlite/shell.c -o desunets.exe
 	./desunets.exe 
