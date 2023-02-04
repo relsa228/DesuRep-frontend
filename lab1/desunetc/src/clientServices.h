@@ -8,6 +8,6 @@
 
 bool auth(std::string uname, std::string password, SOCKET Connection);
 bool reg(std::string uname, std::string password, SOCKET Connection);
-void openChat(int id, SOCKET Connection);
+void openChat(std::string contrAgentName, std::string username, SOCKET Connection);
 SOCKET clientStartUp();
 bool is_number(const std::string& s);

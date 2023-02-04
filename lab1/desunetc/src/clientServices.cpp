@@ -14,23 +14,26 @@ bool auth(std::string uname, std::string password, SOCKET Connection) {
 	send(Connection, creds.c_str(), sizeof(creds), NULL);
 
 	char authResult[3];
-
 	while(authResult[1] != '0' && authResult[1] != '1')
 		recv(Connection, authResult, sizeof(authResult), NULL);
 	
-
-	std::cout << authResult << std::endl;
 	if(strcmp(authResult, "-0") == 0) 
 		return true;
 		
 	return false;
 }
 
-void openChat(int id, SOCKET Connection) {
+void openChat(std::string contrAgentName, std::string username, SOCKET Connection) {
 	while(true)	{
 		system("cls");
 		char commandFlag[3] = "-c";
 		send(Connection, commandFlag, sizeof(commandFlag), NULL);
+
+		std::string chatAgents = username + "\n" + contrAgentName + "\n";
+
+		int sizeOfAgents = chatAgents.size();
+		send(Connection, (char*) &sizeOfAgents, sizeof(int), NULL);
+		send(Connection, chatAgents.c_str(), sizeOfAgents, NULL);
 
 		int chatSize;
 		std::string msgStr = "";
@@ -49,7 +52,7 @@ void openChat(int id, SOCKET Connection) {
 		
 		msgStr.erase(0, 3);
 		for(auto ch : msgStr) {
-			if (ch == '\n'){
+			if (ch == '\n') {
 				std::cout << buffer << std::endl;
 				buffer.clear();
 				continue;
@@ -64,9 +67,15 @@ void openChat(int id, SOCKET Connection) {
 		if (outMsg == "/out") {
 			return;
         }
+		else if (outMsg == "/update") {}
 		else {
 			char commandFlag[3] = "-m";
 			send(Connection, commandFlag, sizeof(commandFlag), NULL);
+
+			std::string sendMessage = "-m\n" + chatAgents + outMsg;
+			int sizeOfSendMessage = sendMessage.size();
+			send(Connection, (char*) &sizeOfSendMessage, sizeof(int), NULL);
+			send(Connection, sendMessage.c_str(), sizeOfSendMessage, NULL);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 #include "serverService.h"
 
+
 void clientAuth(SOCKET newConnection) {
 	int credsSize;
 
@@ -36,7 +37,7 @@ void clientAuth(SOCKET newConnection) {
 }
 
 void sendListOfUsers(SOCKET newConnection) {
-	std::vector<std::string> listOfUsers = {"Debug", "ttt", "Buerak", "little_kitten"};
+	std::vector<std::string> listOfUsers = getListOfUsers();
 
 	std::string stringOfUsers = "-l\n";
 	for(auto uname : listOfUsers) {
@@ -51,8 +52,25 @@ void sendListOfUsers(SOCKET newConnection) {
 }
 
 void sendChatList(SOCKET newConnection) {
-	std::vector<std::string> vectOfMsgs = {"Debug: hi", "relsa: hello", "relsa: yo mama is fat", "debug: wtf?"};
+	int chatUsersSize;
+	recv(newConnection, (char*)&chatUsersSize, sizeof(int), NULL);
+	char* chatUsers = new char[chatUsersSize + 1];
+	chatUsers[chatUsersSize] = '\0';
+	recv(newConnection, chatUsers, chatUsersSize, NULL);
+	std::string chatUsersStr = chatUsers;
 
+	std::string getter = "";
+	std::string sender = "";
+	bool inptFlag = true;
+	for(auto ch : chatUsersStr) {
+		if (ch == '\n')
+			inptFlag = false;
+		else if (inptFlag)
+			getter += ch;
+		else 
+			sender += ch;
+	}
+	std::vector<std::string> vectOfMsgs = getChat(getter, sender);
 	std::string stringOfMsgs = "-c\n";
 	for(auto msg : vectOfMsgs) {
 		stringOfMsgs += msg;
@@ -65,5 +83,42 @@ void sendChatList(SOCKET newConnection) {
 	send(newConnection, stringOfMsgs.c_str(), sizeOfMsgs, NULL);
 }
 
-void saveMsg(SOCKET newConnection) {}
+void saveMsg(SOCKET newConnection) {
+	std::string messageStr = "";
+	std::string getterName = "";
+	std::string senderName = "";
+	bool inptFlag = true;
+	int messageSize;
+
+	while(true) {
+		recv(newConnection, (char*)&messageSize, sizeof(int), NULL);
+		char* message = new char[messageSize + 1];
+		message[messageSize] = '\0';
+		recv(newConnection, message, messageSize, NULL);
+		messageStr = message;
+		if (message[0] == '-' && message[1] == 'm')
+			break;
+	}
+	messageStr.erase(0, 3);
+
+	while(true) {
+		if(messageStr.at(0) == '\n' && !inptFlag)
+			break;
+		
+		if(messageStr.at(0) == '\n') {
+			inptFlag = false;
+			messageStr.erase(0, 1);
+			continue;
+		}
+
+		if(inptFlag)
+			senderName += messageStr.at(0);
+		else
+			getterName += messageStr.at(0);
+		
+		messageStr.erase(0, 1);
+	}
+
+	saveMsg(getterName, senderName, messageStr);
+}
 void regUser(SOCKET newConnection) {}

@@ -3,6 +3,7 @@
 #include <string>
 #include <stdlib.h>
 #include <iostream>
+#include <vector>
 
 #include "clientServices.h"
 
@@ -66,9 +67,11 @@ int main(int argc, char* argv[]) {
 		
 			int counter = 0;
 			std::cout << "Chat users:" << "\n---------------\n" << std::endl;
+			std::vector<std::string> users;
 			for(auto ch : lsUser) {
 				if (ch == '\n'){
 					std::cout << counter << " - " << buffer << std::endl;
+					users.push_back(buffer);
 					buffer = "";
 					counter++;
 					continue;
@@ -81,7 +84,7 @@ int main(int argc, char* argv[]) {
 			std::cin >> chatNumber;
 			
 			if (is_number(chatNumber)) 
-				openChat(stoi(chatNumber), openConnection);
+				openChat(users.at(stoi(chatNumber)), username, openConnection);
 			else if (chatNumber == "/out")
 				break;
 		}

@@ -55,6 +55,8 @@ void usrInterface(int id) {
 }
 
 int main() {
+	dbInit();
+	
 	WSAData wsaData;
 	WORD DLLVersion = MAKEWORD(2, 1);
 	if(WSAStartup(DLLVersion, &wsaData) != 0) {
