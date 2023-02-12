@@ -46,9 +46,7 @@ std::vector<std::string> getListOfUsers() {
 }
 
 std::vector<std::string> getChat(std::string getterId, std::string senderId) {
-    std::string query = "SELECT msg, uname FROM msgs JOIN users ON users.id = msgs.sender  WHERE (sender=" 
-    + std::to_string(getUsrId(senderId)) + " OR sender=" + std::to_string(getUsrId(getterId)) + ") AND (getter=" 
-    + std::to_string(getUsrId(senderId)) + " OR getter=" + std::to_string(getUsrId(getterId)) + ")";
+    std::string query = "SELECT msg, uname FROM msgs JOIN users ON users.id = msgs.sender  WHERE (sender=" + std::to_string(getUsrId(senderId)) + " AND getter=" + std::to_string(getUsrId(getterId)) + ") OR (sender=" + std::to_string(getUsrId(getterId)) + " AND getter=" + std::to_string(getUsrId(senderId)) + ")";
 
     if (getterId == senderId)
         query += ";";
